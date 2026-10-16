@@ -1,360 +1,528 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Simulador Google Play</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Simulador Google Play</title>
 
-        body {
-            background-color: #000;
-            color: #fff;
-            font-family: 'Roboto', Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-        }
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-        /* Contenedor que simula la pantalla del teléfono */
-        #phone-screen {
-            position: relative;
-            width: 600px;  /* Ancho base de tus capturas */
-            height: 1000px; /* Alto base de tus capturas */
-            background-color: #121212;
-            overflow: hidden;
-            border: 2px solid #333; /* Borde para ver el límite del teléfono */
-            border-radius: 20px;
-        }
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    color: #fff;
+    font-family: Roboto, Arial, sans-serif;
+}
 
-        /* Clase para las vistas (pantallas) */
-        .vista {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none; 
-            background-color: #121212;
-            background-size: cover; /* Ajusta la imagen para que cubra todo */
-            background-position: center;
-            background-repeat: no-repeat;
-        }
+#phone-screen {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    background: #121212;
+}
 
-        .vista.activa {
-            display: block; 
-        }
+/* Cada vista conserva las dimensiones y proporciones de su imagen. */
+.vista {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: none;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    background-color: #121212;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    transform-origin: center center;
+}
 
-        /* Botones invisibles superpuestos (Hotspots) */
-        .hotspot {
-            position: absolute;
-            cursor: pointer;
-            background: rgba(255, 0, 0, 0.2); /* Rojo transparente para depurar, luego lo quitas */
-            z-index: 10;
-            border: 1px solid red; /* Borde rojo para ver dónde estás haciendo clic */
-        }
+.vista.activa {
+    display: block;
+}
 
-        /* Estilos para el formulario de tarjeta (GUI) */
-        #formulario-tarjeta {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #1e1e1e;
-            padding: 20px;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
+/* Zonas táctiles transparentes */
+.hotspot {
+    position: absolute;
+    z-index: 10;
+    display: block;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
 
-        #formulario-tarjeta input {
-            width: 80%;
-            margin-bottom: 15px;
-            padding: 12px;
-            border-radius: 5px;
-            border: 1px solid #444;
-            background: #2a2a2a;
-            color: white;
-            font-size: 16px;
-        }
+/* Activa estas reglas temporalmente si necesitas depurar los clics. */
+/*
+.hotspot {
+    background: rgba(255, 0, 0, 0.2);
+    outline: 1px solid red;
+}
+*/
 
-        #formulario-tarjeta button {
-            width: 80%;
-            padding: 12px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+#formulario-tarjeta {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    background: #1e1e1e;
+    overflow-y: auto;
+}
 
-        .btn-guardar { background-color: #4CAF50; color: white; }
-        .btn-atras { background-color: #f44336; color: white; }
+#formulario-tarjeta h2 {
+    margin-bottom: 10px;
+}
 
-        /* Estilos para la lista de compras simuladas */
-        #lista-compras {
-            position: absolute;
-            top: 300px;
-            left: 20px;
-            width: 90%;
-            color: white;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-        
-        .item-compra {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 10px;
-            border-bottom: 1px solid #333;
-            cursor: pointer;
-        }
-        
-        .detalles-compra {
-            margin-left: 10px;
-            flex-grow: 1;
-        }
+#formulario-tarjeta input {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px;
+    border: 1px solid #444;
+    border-radius: 5px;
+    background: #2a2a2a;
+    color: #fff;
+    font-size: 16px;
+}
 
-        .texto-detalle {
-            position: absolute;
-            color: #fff;
-            font-size: 14px;
-            font-weight: bold;
-        }
-    </style>
+#formulario-tarjeta button {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-guardar {
+    background: #4caf50;
+    color: white;
+}
+
+.btn-atras {
+    background: #f44336;
+    color: white;
+}
+
+#lista-compras {
+    position: absolute;
+    top: 300px;
+    left: 20px;
+    width: calc(100% - 40px);
+    max-height: 600px;
+    overflow-y: auto;
+    color: white;
+    scrollbar-width: thin;
+}
+
+.item-compra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 15px 10px;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+}
+
+.detalles-compra {
+    flex: 1;
+    min-width: 0;
+    margin-left: 10px;
+}
+
+.texto-detalle {
+    position: absolute;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+#contenedor-tarjetas-guardadas {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+</style>
 </head>
-<body>
 
+<body>
 <div id="phone-screen">
-    
+
     <!-- VISTA 1: PAGOS Y SUSCRIPCIONES -->
-    <div id="vista-pagos" class="vista activa" style="background-image: url('pagos_suscripciones.jpg');">
-        <!-- Botón: Formas de pago (112, 300) -->
-        <!-- Puse un ancho de 250 y alto de 50 para que sea fácil hacer clic -->
-        <div class="hotspot" style="left: 112px; top: 300px; width: 250px; height: 50px;" onclick="cambiarVista('vista-formas-pago')"></div>
-        
-        <!-- Botón: Historial y presupuesto (104, 768) -->
-        <div class="hotspot" style="left: 104px; top: 768px; width: 250px; height: 50px;" onclick="cambiarVista('vista-historial')"></div>
+    <div id="vista-pagos"
+         class="vista"
+         style="background-image:url('pagos_suscripciones.jpg')">
+
+        <button class="hotspot"
+                aria-label="Formas de pago"
+                style="left:112px;top:300px;width:250px;height:50px"
+                onclick="cambiarVista('vista-formas-pago')"></button>
+
+        <button class="hotspot"
+                aria-label="Historial y presupuesto"
+                style="left:104px;top:768px;width:250px;height:50px"
+                onclick="cambiarVista('vista-historial')"></button>
     </div>
 
     <!-- VISTA 2: FORMAS DE PAGO -->
-    <div id="vista-formas-pago" class="vista" style="background-image: url('formas_pago.jpg');">
-        <!-- Botón: Flecha atrás (52, 35) -->
-        <div class="hotspot" style="left: 52px; top: 35px; width: 40px; height: 40px;" onclick="cambiarVista('vista-pagos')"></div>
-        
-        <!-- Botón: Agregar tarjeta (58, 841) -->
-        <div class="hotspot" style="left: 58px; top: 841px; width: 250px; height: 50px;" onclick="abrirFormularioTarjeta()"></div>
-        
-        <!-- Contenedor dinámico para las tarjetas guardadas -->
-        <div id="contenedor-tarjetas-guardadas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
+    <div id="vista-formas-pago"
+         class="vista"
+         style="background-image:url('formas_pago.jpg')">
+
+        <button class="hotspot"
+                aria-label="Volver"
+                style="left:52px;top:35px;width:40px;height:40px"
+                onclick="cambiarVista('vista-pagos')"></button>
+
+        <button class="hotspot"
+                aria-label="Agregar tarjeta de prueba"
+                style="left:58px;top:841px;width:250px;height:50px"
+                onclick="abrirFormularioTarjeta()"></button>
+
+        <div id="contenedor-tarjetas-guardadas"></div>
     </div>
 
     <!-- VISTA 3: HISTORIAL Y PRESUPUESTO -->
-    <div id="vista-historial" class="vista" style="background-image: url('historial_presupuesto.jpg');">
-        <!-- Botón: Flecha atrás (Asumo que está en la misma posición que Formas de pago) -->
-        <div class="hotspot" style="left: 52px; top: 35px; width: 40px; height: 40px;" onclick="cambiarVista('vista-pagos')"></div>
-        
-        <!-- Barra de progreso interactiva (Principio: 57, 279 - Final: 502, 277) -->
-        <!-- Calculamos el ancho: 502 - 57 = 445px -->
-        <div id="barra-progreso" style="position: absolute; left: 57px; top: 277px; width: 445px; height: 20px; cursor: pointer; z-index: 20;">
+    <div id="vista-historial"
+         class="vista"
+         style="background-image:url('historial_presupuesto.jpg')">
+
+        <button class="hotspot"
+                aria-label="Volver"
+                style="left:52px;top:35px;width:40px;height:40px"
+                onclick="cambiarVista('vista-pagos')"></button>
+
+        <div id="barra-progreso"
+             style="position:absolute;left:57px;top:277px;width:445px;height:20px;cursor:pointer;z-index:20">
         </div>
-        
-        <!-- Contenedor de compras de Robux -->
-        <div id="lista-compras">
-            <!-- Se llenará con JS -->
-        </div>
+
+        <div id="lista-compras"></div>
     </div>
 
-    <!-- VISTA 4: DETALLES DE LA COMPRA -->
-    <div id="vista-detalles" class="vista" style="background-image: url('detalles.jpg');">
-        <!-- Botón: Entendido (Coordenadas: 563, 1313 / 629, 1311 / 694, 1304 / 762, 1310 / 493, 1325) -->
-        <!-- Pongo un botón grande que cubra esos puntos -->
-        <div class="hotspot" style="left: 493px; top: 1304px; width: 280px; height: 50px;" onclick="cambiarVista('vista-historial')"></div>
-        
-        <!-- Texto dinámico para la fecha, forma de pago -->
-        <!-- Fecha: (254, 453) -->
-        <div id="fecha-detalle" class="texto-detalle" style="left: 254px; top: 453px;"></div>
-        <!-- Forma de pago: (105, 688) -->
-        <div id="pago-detalle" class="texto-detalle" style="left: 105px; top: 688px;"></div>
+    <!-- VISTA 4: DETALLES -->
+    <div id="vista-detalles"
+         class="vista"
+         style="background-image:url('detalles.jpg')">
+
+        <!-- Situado sobre el botón azul inferior de la captura. -->
+        <button class="hotspot"
+                aria-label="Entendido"
+                style="left:5.5%;top:90.5%;width:89%;height:8%"
+                onclick="cambiarVista('vista-historial')"></button>
+
+        <div id="fecha-detalle"
+             class="texto-detalle"
+             style="left:254px;top:453px"></div>
+
+        <div id="pago-detalle"
+             class="texto-detalle"
+             style="left:105px;top:688px"></div>
     </div>
 
-    <!-- FORMULARIO EMERGENTE (GUI) PARA AGREGAR TARJETA -->
+    <!-- FORMULARIO LOCAL DE DEMOSTRACIÓN -->
     <div id="formulario-tarjeta">
-        <h2 style="margin-bottom: 20px;">Agregar tarjeta</h2>
-        <input type="text" id="input-numero" placeholder="Número de tarjeta (16 dígitos)" maxlength="16">
-        <input type="text" id="input-nombre" placeholder="Nombre del titular">
-        <input type="text" id="input-pais" placeholder="País">
-        <input type="text" id="input-fecha" placeholder="Fecha de vencimiento (MM/AA)">
-        <input type="text" id="input-cvv" placeholder="CVV" maxlength="3">
-        
-        <button class="btn-guardar" onclick="guardarTarjeta()">Guardar Tarjeta</button>
-        <button class="btn-atras" onclick="cerrarFormularioTarjeta()">Cancelar / Volver</button>
+        <h2>Tarjeta de demostración</h2>
+        <p style="color:#bbb;text-align:center;max-width:400px;margin-bottom:10px">
+            Usa datos ficticios. No introduzcas información bancaria real.
+        </p>
+
+        <input type="text" id="input-numero"
+               placeholder="Número ficticio (últimos 4 dígitos)"
+               maxlength="4" inputmode="numeric">
+
+        <input type="text" id="input-nombre"
+               placeholder="Nombre de demostración">
+
+        <input type="text" id="input-pais"
+               placeholder="País">
+
+        <input type="text" id="input-fecha"
+               placeholder="Fecha ficticia (MM/AA)">
+
+        <button class="btn-guardar" onclick="guardarTarjeta()">
+            Guardar en la demostración
+        </button>
+
+        <button class="btn-atras" onclick="cerrarFormularioTarjeta()">
+            Cancelar / Volver
+        </button>
     </div>
 
 </div>
 
 <script>
-    // --- ESTADO GLOBAL DE LA APLICACIÓN ---
-    let tarjetasGuardadas = [];
-    let gastoTotal = 0; 
-    const PRESUPUESTO_MAXIMO = 1000000;
-    
-    // --- FUNCIÓN PARA CAMBIAR DE VISTA ---
-    function cambiarVista(idVista) {
-        document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
-        document.getElementById(idVista).classList.add('activa');
-        
-        if(idVista === 'vista-historial') {
-            renderizarCompras();
-        }
+const tarjetasGuardadas = [];
+let gastoTotal = 0;
+let comprasRealizadas = [];
+
+const PRESUPUESTO_MAXIMO = 1000000;
+const PRECIO_ROBUX = 4400;
+
+/*
+ * Lee las dimensiones reales de cada fondo.
+ * La imagen, los hotspots y los elementos dinámicos se escalan juntos.
+ */
+function ajustarVistasResponsivas() {
+    const pantalla = document.getElementById('phone-screen');
+    const margen = 8;
+
+    document.querySelectorAll('.vista').forEach(vista => {
+        const fondo = getComputedStyle(vista).backgroundImage;
+        const coincidencia = fondo.match(/url\(["']?(.*?)["']?\)/);
+
+        if (!coincidencia) return;
+
+        const imagen = new Image();
+
+        imagen.onload = () => {
+            const anchoOriginal = imagen.naturalWidth;
+            const altoOriginal = imagen.naturalHeight;
+
+            if (!anchoOriginal || !altoOriginal) return;
+
+            const anchoDisponible = Math.max(1, pantalla.clientWidth - margen * 2);
+            const altoDisponible = Math.max(1, pantalla.clientHeight - margen * 2);
+
+            const escala = Math.min(
+                anchoDisponible / anchoOriginal,
+                altoDisponible / altoOriginal
+            );
+
+            vista.style.width = anchoOriginal + 'px';
+            vista.style.height = altoOriginal + 'px';
+            vista.style.backgroundSize =
+                anchoOriginal + 'px ' + altoOriginal + 'px';
+
+            vista.style.transform =
+                `translate(-50%, -50%) scale(${escala})`;
+        };
+
+        imagen.onerror = () => {
+            console.error('No se pudo cargar la imagen:', coincidencia[1]);
+        };
+
+        imagen.src = coincidencia[1];
+    });
+}
+
+let temporizadorAjuste;
+
+function programarAjuste() {
+    clearTimeout(temporizadorAjuste);
+    temporizadorAjuste = setTimeout(ajustarVistasResponsivas, 80);
+}
+
+window.addEventListener('resize', programarAjuste);
+window.addEventListener('orientationchange', programarAjuste);
+
+/* Navegación */
+function cambiarVista(idVista) {
+    const destino = document.getElementById(idVista);
+    if (!destino) return;
+
+    document.querySelectorAll('.vista').forEach(vista => {
+        vista.classList.remove('activa');
+    });
+
+    destino.classList.add('activa');
+
+    if (idVista === 'vista-historial') {
+        renderizarCompras();
+    }
+}
+
+/* Tarjetas ficticias */
+function abrirFormularioTarjeta() {
+    document.getElementById('formulario-tarjeta').style.display = 'flex';
+}
+
+function cerrarFormularioTarjeta() {
+    document.getElementById('formulario-tarjeta').style.display = 'none';
+
+    ['input-numero', 'input-nombre', 'input-pais', 'input-fecha']
+        .forEach(id => document.getElementById(id).value = '');
+}
+
+function guardarTarjeta() {
+    const ultimos4 = document.getElementById('input-numero').value
+        .replace(/\D/g, '')
+        .slice(-4);
+
+    if (ultimos4.length !== 4) {
+        alert('Introduce exactamente 4 dígitos ficticios para la demostración.');
+        return;
     }
 
-    // --- LÓGICA DE AGREGAR TARJETA ---
-    function abrirFormularioTarjeta() {
-        document.getElementById('formulario-tarjeta').style.display = 'flex';
-    }
+    tarjetasGuardadas.push({
+        ultimos4,
+        tipo: 'Visa'
+    });
 
-    function cerrarFormularioTarjeta() {
-        document.getElementById('formulario-tarjeta').style.display = 'none';
-        document.getElementById('input-numero').value = '';
-        document.getElementById('input-nombre').value = '';
-        document.getElementById('input-pais').value = '';
-        document.getElementById('input-fecha').value = '';
-        document.getElementById('input-cvv').value = '';
-    }
+    cerrarFormularioTarjeta();
+    renderizarTarjetas();
+}
 
-    function guardarTarjeta() {
-        const numero = document.getElementById('input-numero').value;
-        if(numero.length < 4) {
-            alert("Por favor ingresa un número de tarjeta válido (mínimo 4 dígitos).");
-            return;
-        }
-        const ultimos4 = numero.slice(-4);
-        tarjetasGuardadas.push({ ultimos4: ultimos4, tipo: "Visa" });
-        cerrarFormularioTarjeta();
-        renderizarTarjetas();
-    }
+function renderizarTarjetas() {
+    const contenedor = document.getElementById('contenedor-tarjetas-guardadas');
+    contenedor.innerHTML = '';
 
-    function renderizarTarjetas() {
-        const contenedor = document.getElementById('contenedor-tarjetas-guardadas');
-        contenedor.innerHTML = ''; 
+    const topBase = 593;
+    const leftBase = 57;
 
-        // Coordenadas exactas: 57, 593
-        let topBase = 593; 
-        let leftBase = 57; 
+    tarjetasGuardadas.forEach((tarjeta, index) => {
+        const fila = document.createElement('div');
 
-        tarjetasGuardadas.forEach((tarjeta, index) => {
-            const divTarjeta = document.createElement('div');
-            const topActual = topBase + (index * 60); // Se separan 60px hacia abajo
-            
-            divTarjeta.style.position = 'absolute';
-            divTarjeta.style.left = leftBase + 'px';
-            divTarjeta.style.top = topActual + 'px';
-            divTarjeta.style.display = 'flex';
-            divTarjeta.style.alignItems = 'center';
-            divTarjeta.style.zIndex = '15'; 
+        Object.assign(fila.style, {
+            position: 'absolute',
+            left: leftBase + 'px',
+            top: (topBase + index * 60) + 'px',
+            display: 'flex',
+            alignItems: 'center',
+            zIndex: '15'
+        });
 
-            const img = document.createElement('img');
-            img.src = 'visa.jpg'; 
-            img.style.width = '40px';
-            img.style.height = 'auto';
-            img.style.marginRight = '15px';
-            
-            const texto = document.createElement('span');
-            texto.innerText = `${tarjeta.tipo}-${tarjeta.ultimos4}`;
-            texto.style.color = '#fff';
-            texto.style.fontSize = '16px';
+        const img = document.createElement('img');
+        img.src = 'visa.jpg';
+        img.alt = 'Visa de demostración';
+        img.style.width = '40px';
+        img.style.height = 'auto';
+        img.style.marginRight = '15px';
 
-            divTarjeta.appendChild(img);
-            divTarjeta.appendChild(texto);
-            contenedor.appendChild(divTarjeta);
+        const texto = document.createElement('span');
+        texto.textContent = `${tarjeta.tipo}-${tarjeta.ultimos4}`;
+        texto.style.color = '#fff';
+        texto.style.fontSize = '16px';
+
+        fila.append(img, texto);
+        contenedor.appendChild(fila);
+    });
+}
+
+/* Historial de demostración */
+function configurarBarraPresupuesto() {
+    const barra = document.getElementById('barra-progreso');
+
+    barra.addEventListener('click', event => {
+        const rect = barra.getBoundingClientRect();
+        if (!rect.width) return;
+
+        const porcentaje = Math.max(
+            0,
+            Math.min(1, (event.clientX - rect.left) / rect.width)
+        );
+
+        gastoTotal = Math.round(porcentaje * PRESUPUESTO_MAXIMO);
+        actualizarComprasPorGasto();
+        renderizarCompras();
+    });
+}
+
+function actualizarComprasPorGasto() {
+    comprasRealizadas = [];
+
+    const cantidad = Math.floor(gastoTotal / PRECIO_ROBUX);
+    const formaPago = tarjetasGuardadas.length
+        ? `${tarjetasGuardadas[0].tipo}-${tarjetasGuardadas[0].ultimos4}`
+        : 'Visa-3295';
+
+    for (let i = 0; i < cantidad; i++) {
+        comprasRealizadas.push({
+            id: `DEMO-${i + 1}`,
+            monto: PRECIO_ROBUX,
+            robux: 320,
+            fecha: '16 de octubre de 2026',
+            formaPago
         });
     }
+}
 
-    // --- LÓGICA DE HISTORIAL Y PRESUPUESTO ---
-    function configurarBarraPresupuesto() {
-        const barra = document.getElementById('barra-progreso');
-        
-        barra.addEventListener('click', function(e) {
-            const rect = barra.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            let porcentaje = clickX / rect.width;
-            if (porcentaje < 0) porcentaje = 0;
-            if (porcentaje > 1) porcentaje = 1;
-            gastoTotal = Math.round(porcentaje * PRESUPUESTO_MAXIMO);
-            actualizarComprasPorGasto();
-            renderizarCompras();
+function renderizarCompras() {
+    const contenedor = document.getElementById('lista-compras');
+    contenedor.innerHTML = '';
+
+    if (comprasRealizadas.length === 0) {
+        const mensaje = document.createElement('p');
+        mensaje.textContent = 'No hay compras en esta demostración.';
+        mensaje.style.cssText =
+            'color:#888;text-align:center;margin-top:50px';
+        contenedor.appendChild(mensaje);
+        return;
+    }
+
+    comprasRealizadas.forEach(compra => {
+        const item = document.createElement('div');
+        item.className = 'item-compra';
+
+        const icono = document.createElement('div');
+        icono.style.cssText = [
+            'width:40px',
+            'height:40px',
+            'flex-shrink:0',
+            'background:#3b5998',
+            'border-radius:8px',
+            'display:flex',
+            'justify-content:center',
+            'align-items:center'
+        ].join(';');
+        icono.textContent = 'R';
+        icono.style.fontSize = '20px';
+
+        const detalles = document.createElement('div');
+        detalles.className = 'detalles-compra';
+
+        const titulo = document.createElement('div');
+        titulo.style.fontWeight = 'bold';
+        titulo.textContent = '320 Robux · DEMO';
+
+        const fecha = document.createElement('div');
+        fecha.style.cssText = 'font-size:12px;color:#aaa';
+        fecha.textContent = compra.fecha;
+
+        detalles.append(titulo, fecha);
+
+        const precio = document.createElement('div');
+        precio.style.fontWeight = 'bold';
+        precio.textContent = '$' + compra.monto.toLocaleString('es-CL');
+
+        item.append(icono, detalles, precio);
+
+        item.addEventListener('click', () => {
+            document.getElementById('fecha-detalle').textContent = compra.fecha;
+            document.getElementById('pago-detalle').textContent =
+                compra.formaPago + ' · DEMO';
+
+            cambiarVista('vista-detalles');
         });
-    }
 
-    let comprasRealizadas = [];
+        contenedor.appendChild(item);
+    });
+}
 
-    function actualizarComprasPorGasto() {
-        comprasRealizadas = [];
-        let gastoRestante = gastoTotal;
-        const precioRobux = 4400; 
-
-        while (gastoRestante >= precioRobux) {
-            comprasRealizadas.push({
-                id: 'GPA.' + Math.floor(Math.random() * 1000000),
-                monto: precioRobux,
-                robux: 320,
-                fecha: '16 de octubre de 2026',
-                formaPago: tarjetasGuardadas.length > 0 ? `${tarjetasGuardadas[0].tipo}-${tarjetasGuardadas[0].ultimos4}` : 'Visa-3295'
-            });
-            gastoRestante -= precioRobux;
-        }
-    }
-
-    function renderizarCompras() {
-        const contenedor = document.getElementById('lista-compras');
-        contenedor.innerHTML = '';
-        if (comprasRealizadas.length === 0) {
-            contenedor.innerHTML = '<p style="color: #888; text-align: center; margin-top: 50px;">No hay compras realizadas.</p>';
-            return;
-        }
-        comprasRealizadas.forEach((compra) => {
-            const item = document.createElement('div');
-            item.className = 'item-compra';
-            
-            const icono = document.createElement('div');
-            icono.style.width = '40px'; icono.style.height = '40px';
-            icono.style.backgroundColor = '#3b5998'; icono.style.borderRadius = '8px';
-            icono.style.display = 'flex'; icono.style.justifyContent = 'center'; icono.style.alignItems = 'center';
-            icono.innerHTML = '<span style="font-size: 20px;">R</span>';
-
-            const detalles = document.createElement('div');
-            detalles.className = 'detalles-compra';
-            detalles.innerHTML = `<div style="font-weight: bold;">320 Robux</div><div style="font-size: 12px; color: #aaa;">${compra.fecha}</div>`;
-
-            const precio = document.createElement('div');
-            precio.innerText = `$${compra.monto}`;
-            precio.style.fontWeight = 'bold';
-
-            item.appendChild(icono); item.appendChild(detalles); item.appendChild(precio);
-
-            item.onclick = () => {
-                document.getElementById('fecha-detalle').innerText = compra.fecha;
-                document.getElementById('pago-detalle').innerText = compra.formaPago;
-                cambiarVista('vista-detalles');
-            };
-            contenedor.appendChild(item);
-        });
-    }
-
-    // --- INICIALIZACIÓN ---
-    window.onload = function() {
-        configurarBarraPresupuesto();
-        cambiarVista('vista-pagos');
-    };
+/* Inicio */
+window.addEventListener('load', () => {
+    configurarBarraPresupuesto();
+    ajustarVistasResponsivas();
+    cambiarVista('vista-pagos');
+});
 </script>
-
 </body>
 </html>
