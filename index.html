@@ -2,31 +2,31 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Simulador Google Play</title>
     <style>
-        /* Estilos generales para simular la pantalla de un teléfono */
+        /* Resetear márgenes y hacer que ocupe toda la pantalla */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             background-color: #000;
             color: #fff;
             font-family: 'Roboto', Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            overflow: hidden;
+            overflow: hidden; /* Evita scroll */
+            width: 100vw;
+            height: 100vh;
         }
 
         #phone-screen {
             position: relative;
-            width: 600px; /* Ajusta esto si tus imágenes son más anchas */
-            height: 1000px; /* Ajusta esto si tus imágenes son más altas */
+            width: 100vw;
+            height: 100vh;
             background-color: #121212;
             overflow: hidden;
-            border: 1px solid #333;
-            border-radius: 20px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
         }
 
         /* Clase para las vistas (pantallas) */
@@ -38,8 +38,10 @@
             height: 100%;
             display: none; /* Ocultas por defecto */
             background-color: #121212;
-            background-size: cover;
+            /* Ajustamos la imagen para que cubra toda la pantalla sin deformarse */
+            background-size: contain; /* Prueba con 'contain' o 'cover' según tus imágenes */
             background-position: center;
+            background-repeat: no-repeat;
         }
 
         .vista.activa {
@@ -47,16 +49,19 @@
         }
 
         /* Botones invisibles superpuestos (Hotspots) */
+        /* Usamos porcentajes para que se adapten a cualquier pantalla */
         .hotspot {
             position: absolute;
             cursor: pointer;
-            background: rgba(255, 255, 255, 0); /* invisible pero clickeable */
+            background: rgba(255, 255, 255, 0); 
             z-index: 10;
             transition: background 0.2s;
+            /* Borde invisible para depurar si es necesario */
+            /* border: 1px solid red; */ 
         }
         
         .hotspot:hover {
-            background: rgba(255, 255, 255, 0.1); /* Un poco de brillo al pasar el mouse */
+            background: rgba(255, 255, 255, 0.1);
         }
 
         /* Estilos para el formulario de tarjeta (GUI) */
@@ -65,15 +70,18 @@
             top: 0; left: 0; width: 100%; height: 100%;
             background: #1e1e1e;
             padding: 20px;
-            box-sizing: border-box;
             display: none;
             flex-direction: column;
+            justify-content: center;
+            align-items: center;
             z-index: 100;
         }
 
         #formulario-tarjeta input, #formulario-tarjeta select {
+            width: 80%;
+            max-width: 400px;
             margin-bottom: 15px;
-            padding: 10px;
+            padding: 12px;
             border-radius: 5px;
             border: 1px solid #444;
             background: #2a2a2a;
@@ -82,7 +90,9 @@
         }
 
         #formulario-tarjeta button {
-            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            padding: 12px;
             border: none;
             border-radius: 5px;
             font-size: 16px;
@@ -96,17 +106,19 @@
         /* Estilos para la lista de compras simuladas */
         #lista-compras {
             position: absolute;
-            top: 300px; /* Debajo del presupuesto */
-            left: 20px;
+            top: 30%; /* Debajo del presupuesto */
+            left: 5%;
             width: 90%;
             color: white;
+            max-height: 60vh;
+            overflow-y: auto;
         }
         
         .item-compra {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px;
+            padding: 15px 10px;
             border-bottom: 1px solid #333;
             cursor: pointer;
         }
@@ -120,6 +132,14 @@
             margin-left: 10px;
             flex-grow: 1;
         }
+
+        /* Estilos para los textos dinámicos en Detalles */
+        .texto-detalle {
+            position: absolute;
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -127,19 +147,20 @@
 <div id="phone-screen">
     
     <!-- VISTA 1: PAGOS Y SUSCRIPCIONES -->
+    <!-- Ajusta los porcentajes de left y top según tus imágenes reales -->
     <div id="vista-pagos" class="vista activa" style="background-image: url('pagos_suscripciones.jpg');">
-        <!-- Botón: Formas de pago (112, 300) -->
-        <div class="hotspot" style="left: 112px; top: 300px; width: 200px; height: 50px;" onclick="cambiarVista('vista-formas-pago')"></div>
-        <!-- Botón: Historial y presupuesto (104, 768) -->
-        <div class="hotspot" style="left: 104px; top: 768px; width: 250px; height: 50px;" onclick="cambiarVista('vista-historial')"></div>
+        <!-- Botón: Formas de pago (Aproximadamente 20% left, 30% top) -->
+        <div class="hotspot" style="left: 15%; top: 28%; width: 50%; height: 8%;" onclick="cambiarVista('vista-formas-pago')"></div>
+        <!-- Botón: Historial y presupuesto (Aproximadamente 15% left, 75% top) -->
+        <div class="hotspot" style="left: 15%; top: 75%; width: 60%; height: 8%;" onclick="cambiarVista('vista-historial')"></div>
     </div>
 
     <!-- VISTA 2: FORMAS DE PAGO -->
     <div id="vista-formas-pago" class="vista" style="background-image: url('formas_pago.jpg');">
-        <!-- Botón: Flecha atrás -->
-        <div class="hotspot" style="left: 41px; top: 26px; width: 40px; height: 40px;" onclick="cambiarVista('vista-pagos')"></div>
-        <!-- Botón: Agregar tarjeta (58, 841) y (70, 841) -->
-        <div class="hotspot" style="left: 58px; top: 841px; width: 250px; height: 50px;" onclick="abrirFormularioTarjeta()"></div>
+        <!-- Botón: Flecha atrás (Arriba a la izquierda) -->
+        <div class="hotspot" style="left: 5%; top: 2%; width: 10%; height: 6%;" onclick="cambiarVista('vista-pagos')"></div>
+        <!-- Botón: Agregar tarjeta (Abajo, aproximadamente 80% top) -->
+        <div class="hotspot" style="left: 10%; top: 83%; width: 80%; height: 6%;" onclick="abrirFormularioTarjeta()"></div>
         
         <!-- Contenedor dinámico para las tarjetas guardadas -->
         <div id="contenedor-tarjetas-guardadas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
@@ -147,12 +168,12 @@
 
     <!-- VISTA 3: HISTORIAL Y PRESUPUESTO -->
     <div id="vista-historial" class="vista" style="background-image: url('historial_presupuesto.jpg');">
-        <!-- Botón: Flecha atrás (asumiendo que está arriba a la izquierda) -->
-        <div class="hotspot" style="left: 41px; top: 26px; width: 40px; height: 40px;" onclick="cambiarVista('vista-formas-pago')"></div>
+        <!-- Botón: Flecha atrás (Arriba a la izquierda) -->
+        <div class="hotspot" style="left: 5%; top: 2%; width: 10%; height: 6%;" onclick="cambiarVista('vista-formas-pago')"></div>
         
         <!-- Barra de progreso interactiva (simulada con un div) -->
-        <div id="barra-progreso" style="position: absolute; left: 57px; top: 279px; width: 445px; height: 20px; cursor: pointer; z-index: 20;">
-            <!-- El fondo de la barra es la imagen, aquí solo detectamos el clic -->
+        <!-- Ajusta estos porcentajes para que coincidan con la barra de tu imagen -->
+        <div id="barra-progreso" style="position: absolute; left: 10%; top: 28%; width: 80%; height: 3%; cursor: pointer; z-index: 20;">
         </div>
         
         <!-- Contenedor de compras de Robux -->
@@ -163,20 +184,17 @@
 
     <!-- VISTA 4: DETALLES DE LA COMPRA -->
     <div id="vista-detalles" class="vista" style="background-image: url('detalles.jpg');">
-        <!-- Botón: Entendido (para ir hacia atrás) -->
-        <div class="hotspot" style="left: 493px; top: 1325px; width: 150px; height: 50px;" onclick="cambiarVista('vista-historial')"></div>
+        <!-- Botón: Entendido (Abajo) -->
+        <div class="hotspot" style="left: 20%; top: 90%; width: 60%; height: 8%;" onclick="cambiarVista('vista-historial')"></div>
         
-        <!-- Texto dinámico para la fecha, forma de pago, etc. -->
-        <div id="detalles-texto" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; color: white; font-size: 14px;">
-            <!-- Aquí inyectaremos la fecha y forma de pago dinámicamente -->
-            <div id="fecha-detalle" style="position: absolute; left: 254px; top: 453px;"></div>
-            <div id="pago-detalle" style="position: absolute; left: 105px; top: 688px;"></div>
-        </div>
+        <!-- Texto dinámico para la fecha, forma de pago -->
+        <div id="fecha-detalle" class="texto-detalle" style="left: 25%; top: 45%;"></div>
+        <div id="pago-detalle" class="texto-detalle" style="left: 10%; top: 68%;"></div>
     </div>
 
     <!-- FORMULARIO EMERGENTE (GUI) PARA AGREGAR TARJETA -->
     <div id="formulario-tarjeta">
-        <h2>Agregar tarjeta</h2>
+        <h2 style="margin-bottom: 20px;">Agregar tarjeta</h2>
         <input type="text" id="input-numero" placeholder="Número de tarjeta (16 dígitos)" maxlength="16">
         <input type="text" id="input-nombre" placeholder="Nombre del titular">
         <input type="text" id="input-pais" placeholder="País">
@@ -197,12 +215,9 @@
     
     // --- FUNCIÓN PARA CAMBIAR DE VISTA ---
     function cambiarVista(idVista) {
-        // Ocultar todas las vistas
         document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
-        // Mostrar la vista seleccionada
         document.getElementById(idVista).classList.add('activa');
         
-        // Si vamos al historial, actualizamos la lista de compras
         if(idVista === 'vista-historial') {
             renderizarCompras();
         }
@@ -215,7 +230,6 @@
 
     function cerrarFormularioTarjeta() {
         document.getElementById('formulario-tarjeta').style.display = 'none';
-        // Limpiar inputs
         document.getElementById('input-numero').value = '';
         document.getElementById('input-nombre').value = '';
         document.getElementById('input-pais').value = '';
@@ -225,129 +239,84 @@
 
     function guardarTarjeta() {
         const numero = document.getElementById('input-numero').value;
-        const nombre = document.getElementById('input-nombre').value;
-        const pais = document.getElementById('input-pais').value;
-        
         if(numero.length < 4) {
             alert("Por favor ingresa un número de tarjeta válido (mínimo 4 dígitos).");
             return;
         }
-
-        // Extraer últimos 4 dígitos
         const ultimos4 = numero.slice(-4);
-        const tipoTarjeta = "Visa"; // Simulamos que siempre es Visa por la imagen
-
-        // Guardar en el array
-        tarjetasGuardadas.push({
-            ultimos4: ultimos4,
-            tipo: tipoTarjeta,
-            nombre: nombre
-        });
-
-        // Cerrar formulario y actualizar la vista
+        tarjetasGuardadas.push({ ultimos4: ultimos4, tipo: "Visa" });
         cerrarFormularioTarjeta();
         renderizarTarjetas();
     }
 
     function renderizarTarjetas() {
         const contenedor = document.getElementById('contenedor-tarjetas-guardadas');
-        contenedor.innerHTML = ''; // Limpiar
+        contenedor.innerHTML = ''; 
 
-        // Posición base (debajo de la tarjeta 3295)
-        let topBase = 593; // Top que me diste
-        let leftBase = 57; // Left que me diste
+        // Ajusta estos valores según donde quieras que aparezca la tarjeta en tu imagen
+        let topBase = 60; // 60% de la pantalla
+        let leftBase = 10; // 10% de la pantalla
 
         tarjetasGuardadas.forEach((tarjeta, index) => {
-            // Crear el elemento visual de la tarjeta
             const divTarjeta = document.createElement('div');
-            // Ajustamos un poco el top para que no se superpongan si hay varias
-            const topActual = topBase + (index * 60); 
+            const topActual = topBase + (index * 8); // Se separan un 8% hacia abajo
             
             divTarjeta.style.position = 'absolute';
-            divTarjeta.style.left = leftBase + 'px';
-            divTarjeta.style.top = topActual + 'px';
+            divTarjeta.style.left = leftBase + '%';
+            divTarjeta.style.top = topActual + '%';
             divTarjeta.style.display = 'flex';
             divTarjeta.style.alignItems = 'center';
-            divTarjeta.style.zIndex = '15'; // Por encima del fondo
-            divTarjeta.style.pointerEvents = 'auto'; // Para que se pueda interactuar si se desea
+            divTarjeta.style.zIndex = '15'; 
 
-            // Imagen de la tarjeta (visa.jpg)
             const img = document.createElement('img');
-            img.src = 'visa.jpg'; // Asegúrate de que visa.jpg esté en la carpeta
+            img.src = 'visa.jpg'; 
             img.style.width = '40px';
             img.style.height = 'auto';
             img.style.marginRight = '15px';
             
-            // Texto
             const texto = document.createElement('span');
             texto.innerText = `${tarjeta.tipo}-${tarjeta.ultimos4}`;
             texto.style.color = '#fff';
             texto.style.fontSize = '16px';
-            texto.style.fontFamily = 'Arial, sans-serif';
 
             divTarjeta.appendChild(img);
             divTarjeta.appendChild(texto);
-
             contenedor.appendChild(divTarjeta);
         });
     }
 
     // --- LÓGICA DE HISTORIAL Y PRESUPUESTO ---
-    
-    // Inicializar la barra de progreso
     function configurarBarraPresupuesto() {
         const barra = document.getElementById('barra-progreso');
         
-        // Definimos las coordenadas de la barra que me diste
-        // Principio (57, 279) - Final (502, 277)
-        const leftInicio = 57;
-        const leftFin = 502;
-        const anchoMaximo = leftFin - leftInicio; // 445px de ancho
-
         // Detectar clic en la barra para cambiar el gasto
         barra.addEventListener('click', function(e) {
-            // Calcular la posición del clic relativa a la barra
             const rect = barra.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
-            
-            // Calcular el porcentaje (0 a 1)
-            let porcentaje = clickX / anchoMaximo;
+            let porcentaje = clickX / rect.width;
             if (porcentaje < 0) porcentaje = 0;
             if (porcentaje > 1) porcentaje = 1;
-
-            // Calcular el nuevo gasto
             gastoTotal = Math.round(porcentaje * PRESUPUESTO_MAXIMO);
-            
-            // Actualizar visualmente la barra (simulado, ya que la imagen de fondo es estática)
-            // Para hacerlo visualmente, podríamos sobrescribir la imagen o usar un div encima, 
-            // pero como usas la imagen de fondo, solo actualizaremos la lógica.
-            // Si quisieras que se viera la línea azul, tendrías que ocultar la parte de la imagen.
-            // Por ahora, simularemos el cambio con un console.log y actualizando las compras.
-            
             console.log(`Gasto actualizado a: $${gastoTotal}`);
-            
-            // Actualizar la lista de compras basada en el nuevo gasto
             actualizarComprasPorGasto();
             renderizarCompras();
         });
     }
 
-    // Variable para almacenar las compras generadas
     let comprasRealizadas = [];
 
     function actualizarComprasPorGasto() {
         comprasRealizadas = [];
         let gastoRestante = gastoTotal;
-        const precioRobux = 4400; // Precio por compra de 320 Robux
+        const precioRobux = 4400; 
 
-        // Generar compras hasta agotar el gasto (simulando que cada compra es de 4400)
         while (gastoRestante >= precioRobux) {
             comprasRealizadas.push({
-                id: 'GPA.' + Math.floor(Math.random() * 1000000), // ID simulado
+                id: 'GPA.' + Math.floor(Math.random() * 1000000),
                 monto: precioRobux,
                 robux: 320,
-                fecha: '16 de octubre de 2026', // Fecha real solicitada
-                formaPago: tarjetasGuardadas.length > 0 ? `${tarjetasGuardadas[0].tipo}-${tarjetasGuardadas[0].ultimos4}` : 'Visa-3295' // Usa la primera tarjeta guardada o una por defecto
+                fecha: '16 de octubre de 2026',
+                formaPago: tarjetasGuardadas.length > 0 ? `${tarjetasGuardadas[0].tipo}-${tarjetasGuardadas[0].ultimos4}` : 'Visa-3295'
             });
             gastoRestante -= precioRobux;
         }
@@ -356,67 +325,44 @@
     function renderizarCompras() {
         const contenedor = document.getElementById('lista-compras');
         contenedor.innerHTML = '';
-
         if (comprasRealizadas.length === 0) {
-            contenedor.innerHTML = '<p style="color: #888; text-align: center; margin-top: 50px;">No hay compras realizadas en este período.</p>';
+            contenedor.innerHTML = '<p style="color: #888; text-align: center; margin-top: 50px;">No hay compras realizadas.</p>';
             return;
         }
-
-        comprasRealizadas.forEach((compra, index) => {
+        comprasRealizadas.forEach((compra) => {
             const item = document.createElement('div');
             item.className = 'item-compra';
             
-            // Icono de Robux (simulado con un cuadrado azul)
             const icono = document.createElement('div');
-            icono.style.width = '40px';
-            icono.style.height = '40px';
-            icono.style.backgroundColor = '#3b5998';
-            icono.style.borderRadius = '8px';
-            icono.style.display = 'flex';
-            icono.style.justifyContent = 'center';
-            icono.style.alignItems = 'center';
+            icono.style.width = '40px'; icono.style.height = '40px';
+            icono.style.backgroundColor = '#3b5998'; icono.style.borderRadius = '8px';
+            icono.style.display = 'flex'; icono.style.justifyContent = 'center'; icono.style.alignItems = 'center';
             icono.innerHTML = '<span style="font-size: 20px;">R</span>';
 
-            // Detalles
             const detalles = document.createElement('div');
             detalles.className = 'detalles-compra';
-            detalles.innerHTML = `
-                <div style="font-weight: bold;">320 Robux</div>
-                <div style="font-size: 12px; color: #aaa;">${compra.fecha}</div>
-            `;
+            detalles.innerHTML = `<div style="font-weight: bold;">320 Robux</div><div style="font-size: 12px; color: #aaa;">${compra.fecha}</div>`;
 
-            // Precio
             const precio = document.createElement('div');
             precio.innerText = `$${compra.monto}`;
             precio.style.fontWeight = 'bold';
 
-            item.appendChild(icono);
-            item.appendChild(detalles);
-            item.appendChild(precio);
+            item.appendChild(icono); item.appendChild(detalles); item.appendChild(precio);
 
-            // Evento para ver detalles de esta compra
             item.onclick = () => {
-                // Actualizar los textos en la vista de detalles
                 document.getElementById('fecha-detalle').innerText = compra.fecha;
                 document.getElementById('pago-detalle').innerText = compra.formaPago;
-                
-                // Cambiar a la vista de detalles
                 cambiarVista('vista-detalles');
             };
-
             contenedor.appendChild(item);
         });
     }
 
     // --- INICIALIZACIÓN ---
     window.onload = function() {
-        // Configurar la barra de presupuesto
         configurarBarraPresupuesto();
-        
-        // Por defecto, mostramos la vista de pagos
         cambiarVista('vista-pagos');
     };
-
 </script>
 
 </body>
