@@ -26,7 +26,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#f5f5f5}
 .item-compra{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:12px 8px;min-height:64px;border-bottom:1px solid #303030;cursor:pointer}
 .detalles-compra{flex:1;min-width:0}
 .texto-detalle{position:absolute;color:#fff;font-size:16px;line-height:1.25;font-weight:600;white-space:nowrap;pointer-events:none}
-#aviso-demo{position:absolute;left:12px;right:12px;bottom:12px;z-index:90;text-align:center;color:#aaa;font-size:11px;pointer-events:none}
+#aviso-demo{display:none}
+/* Cubren solo el texto estático de la captura para actualizarlo sin duplicarlo. */
+#total-demo{left:48px!important;top:185px!important;width:130px;height:58px;background:#121212;font-size:42px!important;line-height:1.25;padding-top:0}
+#presupuesto-demo{left:285px!important;top:320px!important;width:230px;height:28px;background:#121212;font-size:16px!important;white-space:nowrap}
+#lista-compras{left:30px;top:610px;width:calc(100% - 60px);height:560px;max-height:calc(100% - 630px);overflow-y:auto;overflow-x:hidden;color:#f5f5f5;scrollbar-width:thin;overscroll-behavior:contain}
 @media (prefers-reduced-motion:no-preference){.vista{transition:opacity .08s linear}}
 </style>
 </head>
@@ -130,9 +134,9 @@ function renderizarTarjetas(){
   const cont=document.getElementById('contenedor-tarjetas-guardadas');cont.replaceChildren();
   tarjetasGuardadas.forEach((t,i)=>{
     const fila=document.createElement('div');
-    Object.assign(fila.style,{position:'absolute',left:'85px',top:(760+i*95)+'px',display:'flex',alignItems:'center',gap:'18px',zIndex:'15'});
-    const img=document.createElement('img');img.src='visa.jpg';img.alt='Icono de tarjeta de demostración';img.style.width='50px';img.style.height='auto';
-    const texto=document.createElement('span');texto.textContent=`${t.tipo}-${t.ultimos4} · DEMO`;texto.style.cssText='color:white;font-size:24px';
+    Object.assign(fila.style,{position:'absolute',left:'85px',top:(625+i*58)+'px',display:'flex',alignItems:'center',gap:'18px',zIndex:'15'});
+    const img=document.createElement('img');img.src='visa.jpg';img.alt='Icono de tarjeta de demostración';img.style.width='38px';img.style.height='auto';
+    const texto=document.createElement('span');texto.textContent=`${t.tipo}-${t.ultimos4} · DEMO`;texto.style.cssText='color:white;font-size:18px;background:#121212;padding:2px 5px';
     fila.append(img,texto);cont.append(fila);
   });
 }
