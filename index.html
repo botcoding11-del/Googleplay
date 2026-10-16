@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Simulador Google Play</title>
     <style>
-        /* Resetear márgenes y hacer que ocupe toda la pantalla */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -16,17 +15,22 @@
             background-color: #000;
             color: #fff;
             font-family: 'Roboto', Arial, sans-serif;
-            overflow: hidden; /* Evita scroll */
-            width: 100vw;
-            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
         }
 
+        /* Contenedor que simula la pantalla del teléfono */
         #phone-screen {
             position: relative;
-            width: 100vw;
-            height: 100vh;
+            width: 600px;  /* Ancho base de tus capturas */
+            height: 1000px; /* Alto base de tus capturas */
             background-color: #121212;
             overflow: hidden;
+            border: 2px solid #333; /* Borde para ver el límite del teléfono */
+            border-radius: 20px;
         }
 
         /* Clase para las vistas (pantallas) */
@@ -36,32 +40,24 @@
             left: 0;
             width: 100%;
             height: 100%;
-            display: none; /* Ocultas por defecto */
+            display: none; 
             background-color: #121212;
-            /* Ajustamos la imagen para que cubra toda la pantalla sin deformarse */
-            background-size: contain; /* Prueba con 'contain' o 'cover' según tus imágenes */
+            background-size: cover; /* Ajusta la imagen para que cubra todo */
             background-position: center;
             background-repeat: no-repeat;
         }
 
         .vista.activa {
-            display: block; /* Solo la vista activa se muestra */
+            display: block; 
         }
 
         /* Botones invisibles superpuestos (Hotspots) */
-        /* Usamos porcentajes para que se adapten a cualquier pantalla */
         .hotspot {
             position: absolute;
             cursor: pointer;
-            background: rgba(255, 255, 255, 0); 
+            background: rgba(255, 0, 0, 0.2); /* Rojo transparente para depurar, luego lo quitas */
             z-index: 10;
-            transition: background 0.2s;
-            /* Borde invisible para depurar si es necesario */
-            /* border: 1px solid red; */ 
-        }
-        
-        .hotspot:hover {
-            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid red; /* Borde rojo para ver dónde estás haciendo clic */
         }
 
         /* Estilos para el formulario de tarjeta (GUI) */
@@ -77,9 +73,8 @@
             z-index: 100;
         }
 
-        #formulario-tarjeta input, #formulario-tarjeta select {
+        #formulario-tarjeta input {
             width: 80%;
-            max-width: 400px;
             margin-bottom: 15px;
             padding: 12px;
             border-radius: 5px;
@@ -91,7 +86,6 @@
 
         #formulario-tarjeta button {
             width: 80%;
-            max-width: 400px;
             padding: 12px;
             border: none;
             border-radius: 5px;
@@ -106,11 +100,11 @@
         /* Estilos para la lista de compras simuladas */
         #lista-compras {
             position: absolute;
-            top: 30%; /* Debajo del presupuesto */
-            left: 5%;
+            top: 300px;
+            left: 20px;
             width: 90%;
             color: white;
-            max-height: 60vh;
+            max-height: 600px;
             overflow-y: auto;
         }
         
@@ -123,17 +117,11 @@
             cursor: pointer;
         }
         
-        .item-compra img {
-            width: 40px;
-            height: 40px;
-        }
-        
         .detalles-compra {
             margin-left: 10px;
             flex-grow: 1;
         }
 
-        /* Estilos para los textos dinámicos en Detalles */
         .texto-detalle {
             position: absolute;
             color: #fff;
@@ -147,20 +135,22 @@
 <div id="phone-screen">
     
     <!-- VISTA 1: PAGOS Y SUSCRIPCIONES -->
-    <!-- Ajusta los porcentajes de left y top según tus imágenes reales -->
     <div id="vista-pagos" class="vista activa" style="background-image: url('pagos_suscripciones.jpg');">
-        <!-- Botón: Formas de pago (Aproximadamente 20% left, 30% top) -->
-        <div class="hotspot" style="left: 15%; top: 28%; width: 50%; height: 8%;" onclick="cambiarVista('vista-formas-pago')"></div>
-        <!-- Botón: Historial y presupuesto (Aproximadamente 15% left, 75% top) -->
-        <div class="hotspot" style="left: 15%; top: 75%; width: 60%; height: 8%;" onclick="cambiarVista('vista-historial')"></div>
+        <!-- Botón: Formas de pago (112, 300) -->
+        <!-- Puse un ancho de 250 y alto de 50 para que sea fácil hacer clic -->
+        <div class="hotspot" style="left: 112px; top: 300px; width: 250px; height: 50px;" onclick="cambiarVista('vista-formas-pago')"></div>
+        
+        <!-- Botón: Historial y presupuesto (104, 768) -->
+        <div class="hotspot" style="left: 104px; top: 768px; width: 250px; height: 50px;" onclick="cambiarVista('vista-historial')"></div>
     </div>
 
     <!-- VISTA 2: FORMAS DE PAGO -->
     <div id="vista-formas-pago" class="vista" style="background-image: url('formas_pago.jpg');">
-        <!-- Botón: Flecha atrás (Arriba a la izquierda) -->
-        <div class="hotspot" style="left: 5%; top: 2%; width: 10%; height: 6%;" onclick="cambiarVista('vista-pagos')"></div>
-        <!-- Botón: Agregar tarjeta (Abajo, aproximadamente 80% top) -->
-        <div class="hotspot" style="left: 10%; top: 83%; width: 80%; height: 6%;" onclick="abrirFormularioTarjeta()"></div>
+        <!-- Botón: Flecha atrás (52, 35) -->
+        <div class="hotspot" style="left: 52px; top: 35px; width: 40px; height: 40px;" onclick="cambiarVista('vista-pagos')"></div>
+        
+        <!-- Botón: Agregar tarjeta (58, 841) -->
+        <div class="hotspot" style="left: 58px; top: 841px; width: 250px; height: 50px;" onclick="abrirFormularioTarjeta()"></div>
         
         <!-- Contenedor dinámico para las tarjetas guardadas -->
         <div id="contenedor-tarjetas-guardadas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
@@ -168,12 +158,12 @@
 
     <!-- VISTA 3: HISTORIAL Y PRESUPUESTO -->
     <div id="vista-historial" class="vista" style="background-image: url('historial_presupuesto.jpg');">
-        <!-- Botón: Flecha atrás (Arriba a la izquierda) -->
-        <div class="hotspot" style="left: 5%; top: 2%; width: 10%; height: 6%;" onclick="cambiarVista('vista-formas-pago')"></div>
+        <!-- Botón: Flecha atrás (Asumo que está en la misma posición que Formas de pago) -->
+        <div class="hotspot" style="left: 52px; top: 35px; width: 40px; height: 40px;" onclick="cambiarVista('vista-pagos')"></div>
         
-        <!-- Barra de progreso interactiva (simulada con un div) -->
-        <!-- Ajusta estos porcentajes para que coincidan con la barra de tu imagen -->
-        <div id="barra-progreso" style="position: absolute; left: 10%; top: 28%; width: 80%; height: 3%; cursor: pointer; z-index: 20;">
+        <!-- Barra de progreso interactiva (Principio: 57, 279 - Final: 502, 277) -->
+        <!-- Calculamos el ancho: 502 - 57 = 445px -->
+        <div id="barra-progreso" style="position: absolute; left: 57px; top: 277px; width: 445px; height: 20px; cursor: pointer; z-index: 20;">
         </div>
         
         <!-- Contenedor de compras de Robux -->
@@ -184,12 +174,15 @@
 
     <!-- VISTA 4: DETALLES DE LA COMPRA -->
     <div id="vista-detalles" class="vista" style="background-image: url('detalles.jpg');">
-        <!-- Botón: Entendido (Abajo) -->
-        <div class="hotspot" style="left: 20%; top: 90%; width: 60%; height: 8%;" onclick="cambiarVista('vista-historial')"></div>
+        <!-- Botón: Entendido (Coordenadas: 563, 1313 / 629, 1311 / 694, 1304 / 762, 1310 / 493, 1325) -->
+        <!-- Pongo un botón grande que cubra esos puntos -->
+        <div class="hotspot" style="left: 493px; top: 1304px; width: 280px; height: 50px;" onclick="cambiarVista('vista-historial')"></div>
         
         <!-- Texto dinámico para la fecha, forma de pago -->
-        <div id="fecha-detalle" class="texto-detalle" style="left: 25%; top: 45%;"></div>
-        <div id="pago-detalle" class="texto-detalle" style="left: 10%; top: 68%;"></div>
+        <!-- Fecha: (254, 453) -->
+        <div id="fecha-detalle" class="texto-detalle" style="left: 254px; top: 453px;"></div>
+        <!-- Forma de pago: (105, 688) -->
+        <div id="pago-detalle" class="texto-detalle" style="left: 105px; top: 688px;"></div>
     </div>
 
     <!-- FORMULARIO EMERGENTE (GUI) PARA AGREGAR TARJETA -->
@@ -210,7 +203,7 @@
 <script>
     // --- ESTADO GLOBAL DE LA APLICACIÓN ---
     let tarjetasGuardadas = [];
-    let gastoTotal = 0; // En CLP
+    let gastoTotal = 0; 
     const PRESUPUESTO_MAXIMO = 1000000;
     
     // --- FUNCIÓN PARA CAMBIAR DE VISTA ---
@@ -253,17 +246,17 @@
         const contenedor = document.getElementById('contenedor-tarjetas-guardadas');
         contenedor.innerHTML = ''; 
 
-        // Ajusta estos valores según donde quieras que aparezca la tarjeta en tu imagen
-        let topBase = 60; // 60% de la pantalla
-        let leftBase = 10; // 10% de la pantalla
+        // Coordenadas exactas: 57, 593
+        let topBase = 593; 
+        let leftBase = 57; 
 
         tarjetasGuardadas.forEach((tarjeta, index) => {
             const divTarjeta = document.createElement('div');
-            const topActual = topBase + (index * 8); // Se separan un 8% hacia abajo
+            const topActual = topBase + (index * 60); // Se separan 60px hacia abajo
             
             divTarjeta.style.position = 'absolute';
-            divTarjeta.style.left = leftBase + '%';
-            divTarjeta.style.top = topActual + '%';
+            divTarjeta.style.left = leftBase + 'px';
+            divTarjeta.style.top = topActual + 'px';
             divTarjeta.style.display = 'flex';
             divTarjeta.style.alignItems = 'center';
             divTarjeta.style.zIndex = '15'; 
@@ -289,7 +282,6 @@
     function configurarBarraPresupuesto() {
         const barra = document.getElementById('barra-progreso');
         
-        // Detectar clic en la barra para cambiar el gasto
         barra.addEventListener('click', function(e) {
             const rect = barra.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
@@ -297,7 +289,6 @@
             if (porcentaje < 0) porcentaje = 0;
             if (porcentaje > 1) porcentaje = 1;
             gastoTotal = Math.round(porcentaje * PRESUPUESTO_MAXIMO);
-            console.log(`Gasto actualizado a: $${gastoTotal}`);
             actualizarComprasPorGasto();
             renderizarCompras();
         });
