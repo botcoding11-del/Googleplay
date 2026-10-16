@@ -3,67 +3,74 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Simulador visual</title>
+<title>Simulador visual · Demo</title>
 <style>
+:root{color-scheme:dark;font-family:Roboto,Arial,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font-family:Roboto,Arial,sans-serif}
-#phone-screen{position:fixed;inset:0;overflow:hidden;background:#121212}
-.vista{position:absolute;left:50%;top:50%;display:none;width:1px;height:1px;overflow:hidden;background:#121212 no-repeat 0 0;transform-origin:center center}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#f5f5f5}
+#phone-screen{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;overflow:hidden;background:#121212;isolation:isolate}
+.vista{position:absolute;left:50%;top:50%;display:none;width:1px;height:1px;overflow:hidden;background-color:#121212;background-position:0 0;background-repeat:no-repeat;transform-origin:center center}
 .vista.activa{display:block}
-.hotspot{position:absolute;z-index:10;border:0;background:transparent;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
-#formulario-tarjeta{position:absolute;inset:0;z-index:100;display:none;flex-direction:column;justify-content:center;align-items:center;gap:10px;padding:22px;background:#1e1e1e;overflow:auto}
-#formulario-tarjeta h2{font-size:23px;margin-bottom:4px}
-#formulario-tarjeta p{max-width:400px;text-align:center;color:#bbb;font-size:14px;line-height:1.4}
-#formulario-tarjeta input,#formulario-tarjeta button{width:100%;max-width:400px;padding:13px;border-radius:7px;font-size:16px}
-#formulario-tarjeta input{border:1px solid #444;background:#292929;color:white}
-#formulario-tarjeta button{border:0;color:#fff}
-.btn-guardar{background:#3478f6}.btn-atras{background:#555}
-#lista-compras{position:absolute;left:40px;top:520px;width:calc(100% - 80px);max-height:600px;overflow:auto;color:white;scrollbar-width:thin}
-.item-compra{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:15px 10px;border-bottom:1px solid #333;cursor:pointer;min-height:64px}
-.detalles-compra{flex:1;min-width:0}
+.hotspot{position:absolute;display:block;border:0;background:transparent;padding:0;z-index:30;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+/* Activa esta regla temporalmente para ver las zonas clicables */
+/* .hotspot{background:#ff000033;outline:1px solid #ff3333} */
+#formulario-tarjeta{position:absolute;inset:0;z-index:100;display:none;flex-direction:column;justify-content:center;align-items:center;gap:12px;padding:24px;background:#121212;overflow:auto}
+#formulario-tarjeta h2{font-size:23px;text-align:center}
+#formulario-tarjeta p{max-width:440px;color:#bbb;font-size:14px;line-height:1.45;text-align:center;margin-bottom:8px}
+#formulario-tarjeta input,#formulario-tarjeta button{width:100%;max-width:420px;min-height:48px;padding:12px 14px;border-radius:8px;font-size:16px}
+#formulario-tarjeta input{border:1px solid #555;background:#242424;color:#fff}
+#formulario-tarjeta button{border:0;color:white;font-weight:600}
+.btn-guardar{background:#3867d6}.btn-atras{background:#383838}
 #contenedor-tarjetas-guardadas{position:absolute;inset:0;pointer-events:none}
-.texto-detalle{position:absolute;color:#fff;font-size:22px;line-height:1.25;font-weight:500;white-space:nowrap;pointer-events:none}
+#lista-compras{position:absolute;left:30px;top:610px;width:calc(100% - 60px);height:560px;max-height:calc(100% - 630px);overflow-y:auto;overflow-x:hidden;color:#f5f5f5;scrollbar-width:thin;overscroll-behavior:contain}
+.item-compra{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:12px 8px;min-height:64px;border-bottom:1px solid #303030;cursor:pointer}
+.detalles-compra{flex:1;min-width:0}
+.texto-detalle{position:absolute;color:#fff;font-size:16px;line-height:1.25;font-weight:600;white-space:nowrap;pointer-events:none}
+#aviso-demo{position:absolute;left:12px;right:12px;bottom:12px;z-index:90;text-align:center;color:#aaa;font-size:11px;pointer-events:none}
+@media (prefers-reduced-motion:no-preference){.vista{transition:opacity .08s linear}}
 </style>
 </head>
 <body>
 <div id="phone-screen">
-  <div id="vista-pagos" class="vista" style="background-image:url('pagos_suscripciones.jpg')">
-    <button class="hotspot" aria-label="Formas de pago" style="left:112px;top:300px;width:250px;height:50px" onclick="cambiarVista('vista-formas-pago')"></button>
-    <button class="hotspot" aria-label="Historial y presupuesto" style="left:104px;top:768px;width:250px;height:50px" onclick="cambiarVista('vista-historial')"></button>
-  </div>
+  <section id="vista-pagos" class="vista" style="background-image:url('pagos_suscripciones.jpg')" aria-label="Pagos y suscripciones">
+    <button class="hotspot" aria-label="Abrir formas de pago" style="left:112px;top:300px;width:250px;height:50px" onclick="cambiarVista('vista-formas-pago')"></button>
+    <button class="hotspot" aria-label="Abrir historial y presupuesto" style="left:104px;top:768px;width:250px;height:50px" onclick="cambiarVista('vista-historial')"></button>
+  </section>
 
-  <div id="vista-formas-pago" class="vista" style="background-image:url('formas_pago.jpg')">
-    <button class="hotspot" aria-label="Volver" style="left:35px;top:20px;width:70px;height:70px" onclick="cambiarVista('vista-pagos')"></button>
-    <button class="hotspot" aria-label="Agregar tarjeta de demostración" style="left:35px;top:810px;width:600px;height:70px" onclick="abrirFormularioTarjeta()"></button>
+  <section id="vista-formas-pago" class="vista" style="background-image:url('formas_pago.jpg')" aria-label="Formas de pago">
+    <button class="hotspot" aria-label="Volver a pagos" style="left:35px;top:20px;width:75px;height:75px" onclick="cambiarVista('vista-pagos')"></button>
+    <button class="hotspot" aria-label="Agregar tarjeta ficticia" style="left:35px;top:810px;width:600px;height:75px" onclick="abrirFormularioTarjeta()"></button>
     <div id="contenedor-tarjetas-guardadas"></div>
-  </div>
+  </section>
 
-  <div id="vista-historial" class="vista" style="background-image:url('historial_presupuesto.jpg')">
-    <button class="hotspot" aria-label="Volver" style="left:20px;top:20px;width:60px;height:60px" onclick="cambiarVista('vista-pagos')"></button>
-    <!-- Zona interactiva alineada con la barra original -->
-    <button id="barra-progreso" class="hotspot" aria-label="Ajustar gasto de demostración" style="left:57px;top:277px;width:445px;height:20px"></button>
-    <div id="lista-compras"></div>
-  </div>
+  <section id="vista-historial" class="vista" style="background-image:url('historial_presupuesto.jpg')" aria-label="Historial y presupuesto">
+    <button class="hotspot" aria-label="Volver a pagos" style="left:20px;top:20px;width:65px;height:65px" onclick="cambiarVista('vista-pagos')"></button>
+    <button id="barra-progreso" class="hotspot" aria-label="Tocar para simular un gasto" style="left:57px;top:277px;width:445px;height:24px"></button>
+    <div id="total-demo" style="position:absolute;left:58px;top:185px;color:#eee;font-size:42px;font-weight:500;pointer-events:none">$0</div>
+    <div id="presupuesto-demo" style="position:absolute;left:280px;top:322px;color:#b8c9ed;font-size:18px;pointer-events:none">Presupuesto demo: $1.000.000</div>
+    <div id="lista-compras" aria-live="polite"></div>
+  </section>
 
-  <div id="vista-detalles" class="vista" style="background-image:url('detalles.jpg')">
-    <button class="hotspot" aria-label="Entendido" style="left:5.5%;top:90.5%;width:89%;height:8%" onclick="cambiarVista('vista-historial')"></button>
-    <div id="fecha-detalle" class="texto-detalle" style="left:175px;top:453px;font-size:16px"></div>
-    <div id="pago-detalle" class="texto-detalle" style="left:70px;top:688px;font-size:16px"></div>
-  </div>
+  <section id="vista-detalles" class="vista" style="background-image:url('detalles.jpg')" aria-label="Detalles de compra de demostración">
+    <button class="hotspot" aria-label="Entendido, volver al historial" style="left:5%;top:79%;width:90%;height:8%" onclick="cambiarVista('vista-historial')"></button>
+    <div id="fecha-detalle" class="texto-detalle" style="left:175px;top:453px"></div>
+    <div id="pago-detalle" class="texto-detalle" style="left:70px;top:688px"></div>
+  </section>
 
-  <div id="formulario-tarjeta">
-    <h2>Tarjeta ficticia de demostración</h2>
-    <p>Esta interfaz es solo una maqueta local. No introduzcas datos bancarios reales.</p>
-    <input id="input-numero" type="text" inputmode="numeric" maxlength="4" placeholder="Últimos 4 dígitos ficticios">
-    <input id="input-nombre" type="text" placeholder="Nombre de demostración">
-    <input id="input-pais" type="text" placeholder="País">
-    <input id="input-fecha" type="text" placeholder="Fecha ficticia (MM/AA)">
+  <div id="formulario-tarjeta" role="dialog" aria-modal="true" aria-labelledby="titulo-formulario">
+    <h2 id="titulo-formulario">Tarjeta ficticia de demostración</h2>
+    <p>Maqueta visual local. No ingreses números de tarjeta, CVV ni otros datos bancarios reales.</p>
+    <input id="input-numero" type="text" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="4 dígitos ficticios" aria-label="Cuatro dígitos ficticios">
+    <input id="input-nombre" type="text" autocomplete="off" placeholder="Nombre de demostración" aria-label="Nombre de demostración">
+    <input id="input-pais" type="text" autocomplete="off" placeholder="País (opcional)" aria-label="País opcional">
+    <input id="input-fecha" type="text" autocomplete="off" placeholder="Fecha ficticia MM/AA (opcional)" aria-label="Fecha ficticia opcional">
     <button class="btn-guardar" onclick="guardarTarjeta()">Añadir tarjeta de prueba</button>
     <button class="btn-atras" onclick="cerrarFormularioTarjeta()">Cancelar / volver</button>
   </div>
+  <div id="aviso-demo">DEMO VISUAL · Las compras y tarjetas no son reales</div>
 </div>
-
 <script>
+'use strict';
 const tarjetasGuardadas=[];
 let gastoTotal=0;
 let comprasRealizadas=[];
@@ -71,126 +78,94 @@ const PRESUPUESTO_MAXIMO=1000000;
 const PRECIO_ROBUX=4400;
 const imagenesCargadas=new Map();
 
+function extraerUrlFondo(vista){
+  const fondo=vista.style.backgroundImage || getComputedStyle(vista).backgroundImage;
+  const match=fondo.match(/url\(["']?(.*?)["']?\)/);
+  return match?match[1]:null;
+}
 function prepararVista(vista){
-  const css=getComputedStyle(vista).backgroundImage;
-  const match=css.match(/url\(["']?(.*?)["']?\)/);
-  if(!match)return;
-  const url=match[1];
-  if(imagenesCargadas.has(url)){
-    aplicarDimensiones(vista,imagenesCargadas.get(url));
-    return;
-  }
+  const url=extraerUrlFondo(vista); if(!url)return;
+  if(imagenesCargadas.has(url)){aplicarDimensiones(vista,imagenesCargadas.get(url));return;}
   const img=new Image();
   img.onload=()=>{
     const dims={w:img.naturalWidth,h:img.naturalHeight};
     imagenesCargadas.set(url,dims);
-    document.querySelectorAll('.vista').forEach(v=>{
-      const bg=getComputedStyle(v).backgroundImage.match(/url\(["']?(.*?)["']?\)/);
-      if(bg&&bg[1]===url)aplicarDimensiones(v,dims);
-    });
+    document.querySelectorAll('.vista').forEach(v=>{if(extraerUrlFondo(v)===url)aplicarDimensiones(v,dims);});
   };
-  img.onerror=()=>console.error('No se pudo cargar: '+url);
+  img.onerror=()=>console.error('No se pudo cargar el fondo:',url,'Revisa que esté junto al HTML.');
   img.src=url;
 }
 function aplicarDimensiones(vista,dims){
-  vista.dataset.baseWidth=dims.w;
-  vista.dataset.baseHeight=dims.h;
-  vista.style.width=dims.w+'px';
-  vista.style.height=dims.h+'px';
+  vista.dataset.baseWidth=dims.w;vista.dataset.baseHeight=dims.h;
+  vista.style.width=dims.w+'px';vista.style.height=dims.h+'px';
   vista.style.backgroundSize=dims.w+'px '+dims.h+'px';
   escalarVista(vista);
 }
 function escalarVista(vista){
-  const w=Number(vista.dataset.baseWidth),h=Number(vista.dataset.baseHeight);
-  if(!w||!h)return;
-  const screen=document.getElementById('phone-screen');
-  const scale=Math.min((screen.clientWidth-12)/w,(screen.clientHeight-12)/h);
-  vista.style.transform=`translate(-50%,-50%) scale(${scale})`;
+  const w=Number(vista.dataset.baseWidth),h=Number(vista.dataset.baseHeight);if(!w||!h)return;
+  const pantalla=document.getElementById('phone-screen');
+  const escala=Math.min(pantalla.clientWidth/w,pantalla.clientHeight/h);
+  vista.style.transform=`translate(-50%,-50%) scale(${escala})`;
 }
-function ajustarTodo(){
-  document.querySelectorAll('.vista').forEach(v=>{
-    if(v.dataset.baseWidth)escalarVista(v);
-    else prepararVista(v);
-  });
-}
+function ajustarTodo(){document.querySelectorAll('.vista').forEach(v=>v.dataset.baseWidth?escalarVista(v):prepararVista(v));}
 window.addEventListener('resize',ajustarTodo);
 window.addEventListener('orientationchange',ajustarTodo);
-
 function cambiarVista(id){
-  const destino=document.getElementById(id);
-  if(!destino)return;
+  const destino=document.getElementById(id);if(!destino)return;
   document.querySelectorAll('.vista').forEach(v=>v.classList.remove('activa'));
   destino.classList.add('activa');
   if(id==='vista-historial')renderizarCompras();
 }
-function abrirFormularioTarjeta(){document.getElementById('formulario-tarjeta').style.display='flex'}
+function abrirFormularioTarjeta(){document.getElementById('formulario-tarjeta').style.display='flex';document.getElementById('input-numero').focus();}
 function cerrarFormularioTarjeta(){
   document.getElementById('formulario-tarjeta').style.display='none';
   ['input-numero','input-nombre','input-pais','input-fecha'].forEach(id=>document.getElementById(id).value='');
 }
 function guardarTarjeta(){
   const ultimos4=document.getElementById('input-numero').value.replace(/\D/g,'').slice(-4);
-  if(ultimos4.length!==4){alert('Introduce 4 dígitos ficticios.');return}
-  tarjetasGuardadas.push({ultimos4,tipo:'Visa'});
-  cerrarFormularioTarjeta();renderizarTarjetas();
+  if(ultimos4.length!==4){alert('Escribe exactamente 4 dígitos ficticios.');return;}
+  tarjetasGuardadas.push({ultimos4,tipo:'Visa'});cerrarFormularioTarjeta();renderizarTarjetas();
 }
 function renderizarTarjetas(){
-  const cont=document.getElementById('contenedor-tarjetas-guardadas');cont.innerHTML='';
+  const cont=document.getElementById('contenedor-tarjetas-guardadas');cont.replaceChildren();
   tarjetasGuardadas.forEach((t,i)=>{
-    const row=document.createElement('div');
-    Object.assign(row.style,{position:'absolute',left:'85px',top:(760+i*95)+'px',display:'flex',alignItems:'center',gap:'18px',zIndex:'15'});
-    const img=document.createElement('img');img.src='visa.jpg';img.alt='Marca ficticia';img.style.width='50px';img.style.height='auto';
-    const label=document.createElement('span');label.textContent=`${t.tipo}-${t.ultimos4}`;label.style.cssText='color:white;font-size:24px';
-    row.append(img,label);cont.append(row);
+    const fila=document.createElement('div');
+    Object.assign(fila.style,{position:'absolute',left:'85px',top:(760+i*95)+'px',display:'flex',alignItems:'center',gap:'18px',zIndex:'15'});
+    const img=document.createElement('img');img.src='visa.jpg';img.alt='Icono de tarjeta de demostración';img.style.width='50px';img.style.height='auto';
+    const texto=document.createElement('span');texto.textContent=`${t.tipo}-${t.ultimos4} · DEMO`;texto.style.cssText='color:white;font-size:24px';
+    fila.append(img,texto);cont.append(fila);
   });
 }
 function configurarBarraPresupuesto(){
-  const barra=document.getElementById('barra-progreso');
-  barra.addEventListener('click',e=>{
-    const r=barra.getBoundingClientRect();if(!r.width)return;
-    const pct=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
-    gastoTotal=Math.round(pct*PRESUPUESTO_MAXIMO);
+  document.getElementById('barra-progreso').addEventListener('click',e=>{
+    const r=e.currentTarget.getBoundingClientRect();if(!r.width)return;
+    const porcentaje=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
+    gastoTotal=Math.round(porcentaje*PRESUPUESTO_MAXIMO);
+    document.getElementById('total-demo').textContent='$'+gastoTotal.toLocaleString('es-CL');
     actualizarComprasPorGasto();renderizarCompras();
   });
 }
 function actualizarComprasPorGasto(){
-  comprasRealizadas=[];
   const cantidad=Math.min(80,Math.floor(gastoTotal/PRECIO_ROBUX));
   const pago=tarjetasGuardadas.length?`Visa-${tarjetasGuardadas[0].ultimos4}`:'Visa-3295';
-  for(let i=0;i<cantidad;i++){
-    comprasRealizadas.push({id:'DEMO-'+(i+1),monto:PRECIO_ROBUX,robux:320,fecha:'16 de octubre de 2026',formaPago:pago});
-  }
+  comprasRealizadas=Array.from({length:cantidad},(_,i)=>({id:'DEMO-'+(i+1),monto:PRECIO_ROBUX,robux:320,fecha:'16 de octubre de 2026',formaPago:pago}));
 }
 function renderizarCompras(){
-  const cont=document.getElementById('lista-compras');cont.innerHTML='';
-  if(!comprasRealizadas.length){
-    const p=document.createElement('p');p.textContent='No hay compras en esta demostración.';
-    p.style.cssText='color:#888;text-align:center;margin-top:25px;font-size:18px';cont.append(p);return;
-  }
+  const cont=document.getElementById('lista-compras');cont.replaceChildren();
+  if(!comprasRealizadas.length){const p=document.createElement('p');p.textContent='No hay compras en esta demostración.';p.style.cssText='color:#888;text-align:center;margin-top:25px;font-size:16px';cont.append(p);return;}
   comprasRealizadas.forEach(compra=>{
-    const item=document.createElement('div');item.className='item-compra';
-    const icon=document.createElement('div');
-    icon.style.cssText='width:40px;height:40px;flex-shrink:0;background:#3b5998;border-radius:8px;display:flex;justify-content:center;align-items:center;font-size:20px';
-    icon.textContent='R';
-    const details=document.createElement('div');details.className='detalles-compra';
-    const title=document.createElement('div');title.style.fontWeight='bold';title.textContent='320 Robux · DEMO';
-    const date=document.createElement('div');date.style.cssText='font-size:12px;color:#aaa';date.textContent=compra.fecha;
-    details.append(title,date);
-    const price=document.createElement('div');price.style.fontWeight='bold';price.textContent='$'+compra.monto.toLocaleString('es-CL');
-    item.append(icon,details,price);
-    item.addEventListener('click',()=>{
-      document.getElementById('fecha-detalle').textContent=compra.fecha;
-      document.getElementById('pago-detalle').textContent=compra.formaPago+' · DEMO';
-      cambiarVista('vista-detalles');
-    });
-    cont.append(item);
+    const item=document.createElement('div');item.className='item-compra';item.setAttribute('role','button');item.tabIndex=0;
+    const icon=document.createElement('div');icon.style.cssText='width:40px;height:40px;flex-shrink:0;background:#3b5998;border-radius:8px;display:flex;justify-content:center;align-items:center;font-size:20px';icon.textContent='R';
+    const detalle=document.createElement('div');detalle.className='detalles-compra';
+    const titulo=document.createElement('div');titulo.style.fontWeight='bold';titulo.textContent='320 Robux · DEMO';
+    const fecha=document.createElement('div');fecha.style.cssText='font-size:12px;color:#aaa';fecha.textContent=compra.fecha;detalle.append(titulo,fecha);
+    const precio=document.createElement('div');precio.style.fontWeight='bold';precio.textContent='$'+compra.monto.toLocaleString('es-CL');
+    item.append(icon,detalle,precio);
+    const abrir=()=>{document.getElementById('fecha-detalle').textContent=compra.fecha;document.getElementById('pago-detalle').textContent=compra.formaPago+' · DEMO';cambiarVista('vista-detalles');};
+    item.addEventListener('click',abrir);item.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();abrir();}});cont.append(item);
   });
 }
-window.addEventListener('load',()=>{
-  document.querySelectorAll('.vista').forEach(prepararVista);
-  configurarBarraPresupuesto();
-  cambiarVista('vista-pagos');
-});
+window.addEventListener('load',()=>{document.querySelectorAll('.vista').forEach(prepararVista);configurarBarraPresupuesto();cambiarVista('vista-pagos');});
 </script>
 </body>
 </html>
